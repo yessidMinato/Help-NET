@@ -1,0 +1,68 @@
+using my_crud.Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
+using my_crud.Presentacion;
+
+namespace my_crud
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            mostrar();
+        }
+
+        private void mostrar() {
+            using (dbcrud db = new dbcrud())
+            {
+                var datos = db.usuario
+                    .Where(u => u.estado == 1)
+                    .SelectMany(u => u.facturas
+                        .Select(f => new
+                        {
+                            u.id,
+                            u.nombre,
+                            u.apellido,
+                            u.fechaNaci,
+                            f.monto
+                        })
+                    ).ToList();
+                dataGridView1.DataSource = datos;
+                dataGridView1.Columns["id"].Visible = false;
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            RegistrarNuevo registrarNuevo = new RegistrarNuevo();
+            registrarNuevo.ShowDialog();
+            mostrar();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            int id = int.Parse(dataGridView1.Rows[dataGridView1.CurrentRow.Index].Cells[0].Value.ToString());
+            using (dbcrud db = new dbcrud())
+            {
+                var usuarioE = db.usuario.Find(id);
+                if (usuarioE!=null) {
+                    usuarioE.estado = 0;
+                    db.SaveChanges();
+                    MessageBox.Show("Usuario eliminado correctamente.");
+                    mostrar();
+                }
+                else
+                {
+                    MessageBox.Show("no encontrado");
+                }
+            }
+        }
+    }
+}
