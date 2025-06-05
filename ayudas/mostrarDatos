@@ -15,20 +15,30 @@ namespace my_crud
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            mostrar();
+        }
 
+        private void mostrar() {
             using (dbcrud db = new dbcrud())
             {
                 var datos = db.usuario
-                    .SelectMany(u => u.facturas.Select(f => new
-                    {
-                        u.nombre,
-                        u.apellido,
-                        u.fechaNaci,
-                        f.monto
-                    })
+                    .Where(u => u.estado == 1)
+                    .SelectMany(u => u.facturas
+                        .Select(f => new
+                        {
+                            u.nombre,
+                            u.apellido,
+                            u.fechaNaci,
+                            f.monto
+                        })
                     ).ToList();
                 dataGridView1.DataSource = datos;
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
