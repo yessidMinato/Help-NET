@@ -5,6 +5,8 @@ using System.Linq;
 using System.Windows.Forms;
 using my_crud.Presentacion;
 
+
+// para el eliminar en el datagridview en selectionmode = fullrowselected
 namespace my_crud
 {
     public partial class Form1 : Form
