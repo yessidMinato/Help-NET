@@ -1,0 +1,42 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using my_crud.Model;
+
+namespace my_crud.Presentacion
+{
+    public partial class RegistrarNuevo : Form
+    {
+        public RegistrarNuevo()
+        {
+            InitializeComponent();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            using (dbcrud db = new dbcrud())
+            {
+                var nuevoUsuario = new usuario
+                {
+                    nombre = txtnombre.Text,
+                    apellido = txtapellido.Text,
+                    fechaNaci = dtfechaNaci.Value,
+                    estado = 1,
+                    facturas = new List<facturas> {
+                        new facturas { monto = int.Parse(txtmonto.Text)}
+                    }
+                };
+
+                db.usuario.Add(nuevoUsuario);
+                db.SaveChanges();
+                this.Close();
+            }
+        }
+    }
+}
