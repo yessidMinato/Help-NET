@@ -1,0 +1,76 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using exam_test2.Model;
+
+namespace exam_test2.Presentacion
+{
+    public partial class registro : Form
+    {
+        public registro()
+        {
+            InitializeComponent();
+        }
+
+        private void registro_Load(object sender, EventArgs e)
+        {
+            using (dbexam db = new dbexam())
+            {
+                comboBox1.DataSource = db.operacion.ToList();
+                comboBox1.DisplayMember = "tipo";
+                comboBox1.ValueMember = "idOperacion";
+
+                comboBox2.DataSource = db.modulo.ToList();
+                comboBox2.DisplayMember = "tipo";
+                comboBox2.ValueMember = "idModulo";
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            using (dbexam db = new dbexam()) {
+                var nuevaTransaccion = new transaccion
+                {
+                    fecha = dateTimePicker1.Value,
+                    observaciones = txtobservaciones.Text,
+                    datosCliente = txtdatoscliente.Text,
+                    totalPagado = 0,
+                    idOperacion = Convert.ToInt32(comboBox1.SelectedValue),
+                    idModulo = Convert.ToInt32(comboBox2.SelectedValue),
+                    estado = 1
+                };
+
+                db.transaccion.Add(nuevaTransaccion);
+                db.SaveChanges();
+                var nuevoConcepto = new concepto {
+                    detalleConcepto = txtconcepto.Text
+                };
+
+                db.concepto.Add(nuevoConcepto);
+                db.SaveChanges();
+
+                var nuevoDetalle = new detalle { 
+                    monto = int.Parse(txtmonto.Text),
+                    idTransaccion = nuevaTransaccion.idTransaccion,
+                    idConcepto = nuevoConcepto.idConcepto,
+                };
+
+                db.detalle.Add(nuevoDetalle);
+                db.SaveChanges();
+
+                var montoTotal = db.detalle
+                    .Where(d => d.idTransaccion == nuevaTransaccion.idTransaccion)
+                    .Sum(d => d.monto);
+                nuevaTransaccion.totalPagado = montoTotal;
+                db.SaveChanges();
+                this.Close();
+            }
+        }
+    }
+}

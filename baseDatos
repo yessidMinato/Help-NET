@@ -1,0 +1,112 @@
+insert into transaccion(
+fecha,
+observaciones,
+ciCliente,
+nombreCliente,
+totalPagado,
+idOperacion,
+idModulo,
+estado)
+values
+('2024-10-11','ningua obs',123,'homero',100,1,1,1);
+
+insert into detalle_transaccion
+(idTransaccion,
+idDetalle,
+monto,
+idConcepto,
+detalleConcepto)
+values
+(2,1,100,1,'detalle concepto1');
+
+DROP TABLE IF EXISTS detalle_transaccion;
+
+
+CREATE TABLE detalle_transaccion (
+    idDetalle INT IDENTITY(1,1) PRIMARY KEY,
+    idTransaccion INT,
+    monto FLOAT,
+    idConcepto INT,
+    detalleConcepto VARCHAR(100),
+    FOREIGN KEY (idTransaccion) REFERENCES transaccion(idTransaccion),
+    FOREIGN KEY (idConcepto) REFERENCES concepto(idConcepto)
+);
+
+
+-- FINAL --
+create table operacion(
+	idOperacion int identity(1,1),
+	tipo varchar(100),
+	primary key (idOperacion)
+);
+
+create table modulo(
+	idModulo int identity(1,1),
+	tipo varchar(100),
+	primary key (idModulo)
+);
+
+create table concepto(
+	idConcepto int identity(1,1),
+	detalleConcepto varchar(100),
+	primary key (idConcepto)
+);
+
+insert into operacion(tipo)
+values
+('deposito'),
+('retiro'),
+('pago');
+
+insert into modulo(tipo)
+values
+('targeta debito'),
+('cuenta de ahorro'),
+('targeta credito');
+
+INSERT INTO concepto (detalleConcepto) VALUES ('Pago de luz');
+
+create table transaccion(
+	idTransaccion int identity(1,1),
+	fecha date,
+	observaciones varchar(100),
+	datosCliente varchar(100),
+	totalPagado float,
+	idOperacion int,
+	idModulo int,
+	estado int,
+
+	primary key (idTransaccion),
+	foreign key (idOperacion) references operacion(idOperacion),
+	foreign key (idModulo) references modulo(idModulo)
+);
+
+create table detalle(
+	idDetalle int identity(1,1),
+	monto float,
+	idTransaccion int,
+	idConcepto int,
+
+	primary key (idDetalle),
+	foreign key (idTransaccion) references transaccion(idTransaccion),
+	foreign key (idConcepto) references concepto(idConcepto)
+);
+
+INSERT INTO transaccion (
+    fecha, observaciones, datosCliente, totalPagado, 
+    idOperacion, idModulo, estado
+)
+VALUES (
+    GETDATE(), 'Pago realizado desde app', 'Juan Pérez', 150.50, 
+    1, 1, 1
+);
+
+INSERT INTO detalle (
+    monto, idTransaccion, idConcepto
+)
+VALUES (
+    150.50, 1, 1
+);
+
+select *
+from transaccion

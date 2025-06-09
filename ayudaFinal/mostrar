@@ -1,0 +1,57 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Data.Entity;
+using System.Drawing;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using exam_test2.Model;
+using exam_test2.Presentacion;
+
+namespace exam_test2
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            mostrar();   
+        }
+
+        private void mostrar() {
+            using (dbexam db = new dbexam())
+            {
+                var datos = db.transaccion
+                    .Where(t => t.estado == 1)
+                    .Include(t => t.operacion)
+                    .Include(t => t.modulo)
+                    .Select(
+                        t => new {
+                            t.fecha,
+                            t.observaciones,
+                            t.datosCliente,
+                            t.totalPagado,
+                            tipoOperacion = t.operacion.tipo,
+                            tipoModulo = t.modulo.tipo
+                        }
+                    ).ToList();
+                dataGridView1.DataSource = datos;
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            registro r1 = new registro();
+            r1.ShowDialog();
+            mostrar();
+        }
+    }
+}
